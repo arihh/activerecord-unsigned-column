@@ -64,6 +64,15 @@ module ActiveRecord
       end
       alias_method_chain :type_to_sql, :unsigned
 
+      def quote_with_unsigned(value, column = nil)
+        if value.kind_of?(String) && column && column.type.in?([:unsigned, :unsigned_bigint])
+          value.to_i.to_s
+        else
+          quote_without_unsigned(value, column)
+        end
+      end
+      alias_method_chain :quote, :unsigned
+
       NATIVE_DATABASE_TYPES.merge!(
         :unsigned => { :name => 'int(10) unsigned', :limit => 4 }
       )
